@@ -30,7 +30,10 @@ class MoneyController extends Controller
         $date = Carbon::now();
         File::append(base_path().'/public/file.txt', 'data2'.PHP_EOL);
         File::append(base_path().'/public/file.txt',
-            'oprration_id:'.$request['operation_id'].','.'datetime: '.$request['datetime'].','.$request['sha1_hash'].','.$request['withdraw_amount'].',label:'.$request['label'].','.$date.PHP_EOL);
+            'oprration_id:'.$request['operation_id'].','.'datetime: '
+            .$request['datetime'].','.$request['sha1_hash'].','
+            .$request['withdraw_amount'].',label:'.$request['label'].','.$date
+            .PHP_EOL);
 
 
         $str = $_POST['notification_type'].'&'.
@@ -39,20 +42,20 @@ class MoneyController extends Controller
             $_POST['currency'].'&'.
             $_POST['datetime'].'&'.
             $_POST['sender'].'&'.
-            $_POST['codepro'].'&66zzO9164xWnEsNEX6K73nFo&'.
+            $_POST['codepro'].'&"saadsdsdsaddsadasda"&'.
             $_POST['label'];
 
-         /*       if (sha1($str) != $_POST['sha1_hash']) {
-                    return null;
-                }
-        */
+        /*       if (sha1($str) != $_POST['sha1_hash']) {
+                   return null;
+               }
+       */
 
         $operation_id = $request['operation_id'];
         if ($operation_id == 'test-notification') {
             try {
                 $rez = DB::table('money_history')->insert([
-                    'date' => $request->datetime,
-                    'lable' => $request->lable,
+                    'date'   => $request->datetime,
+                    'lable'  => $request->lable,
                     'amount' => $request->amount,
                 ]);
             } catch (IOException $exceptione) {
@@ -61,7 +64,8 @@ class MoneyController extends Controller
         }
 
 
-        $user = User::select(['id', 'email', 'name', 'money'])->where(['account' => $request->label])->first();
+        $user = User::select(['id', 'email', 'name', 'money'])
+            ->where(['account' => $request->label])->first();
         if ($user == null) {
             return null;
         }
@@ -77,11 +81,11 @@ class MoneyController extends Controller
         // вставляем историю
         try {
             DB::table('money_history')->insert([
-                'date' => $date,
-                'user_email' => $user->email,
-                'received' => $ammount,
+                'date'         => $date,
+                'user_email'   => $user->email,
+                'received'     => $ammount,
                 'operation_id' => $operation_id,
-                'user_name'=>$user->name
+                'user_name'    => $user->name,
             ]);
         } catch (IOException $exceptione) {
             echo $exceptione;
@@ -95,13 +99,14 @@ class MoneyController extends Controller
         $toTop = DB::table('prices')->where('price_name', 'to_top')->first();
 
         return response()->json([
-            $toTop->price
+            $toTop->price,
         ]);
     }
 
     public function getpricetofirstplase(Request $request)
     {
-        $toFirstPlase = DB::table('prices')->where('price_name', 'to_first_place')->first();
+        $toFirstPlase = DB::table('prices')
+            ->where('price_name', 'to_first_place')->first();
 
         return response()->json([
             $toFirstPlase->price,
@@ -110,7 +115,8 @@ class MoneyController extends Controller
 
     public function getpricetoseach()
     {
-        $toFirstPlase = DB::table('prices')->where('price_name', 'seach')->first();
+        $toFirstPlase = DB::table('prices')->where('price_name', 'seach')
+            ->first();
 
         return response()->json([
             $toFirstPlase->price,
@@ -120,7 +126,8 @@ class MoneyController extends Controller
 
     public function getpricechangemainimage()
     {
-        $toFirstPlase = DB::table('prices')->where('price_name', 'change_main_image')->first();
+        $toFirstPlase = DB::table('prices')
+            ->where('price_name', 'change_main_image')->first();
 
         return response()->json([
             $toFirstPlase->price,
@@ -139,7 +146,8 @@ class MoneyController extends Controller
             'endvip',
         ])->where('user_id', $user->id)->first();
         $money = $user->money;
-        $toFirstPlase = collect(DB::select('select price from prices where price_name = :price_name',
+        $toFirstPlase
+            = collect(DB::select('select price from prices where price_name = :price_name',
             ['price_name' => 'to_first_plase']))->first();
         $toFirstPlase->price;
         if ($toFirstPlase->price > $money) {
@@ -166,7 +174,8 @@ class MoneyController extends Controller
         ])->where('user_id', $user->id)->first();
 
         $money = $user->money;
-        $toTop = collect(DB::select('select price from prices where price_name = :price_name',
+        $toTop
+            = collect(DB::select('select price from prices where price_name = :price_name',
             ['price_name' => 'to_top']))->first();
 
         $days = $request->days;
@@ -181,7 +190,9 @@ class MoneyController extends Controller
         $days = floor($days); //кругляем полученнаы дни
         //
 
-        if ($end_vip == null or $end_vip < $current_date) {  //есть ли сейчас vip статусэ
+        if ($end_vip == null or $end_vip
+            < $current_date
+        ) {  //есть ли сейчас vip статусэ
             echo "endvip";
             $end_vip = $current_date;
             $begin_vip = $current_date;
@@ -197,7 +208,8 @@ class MoneyController extends Controller
         $user->save();
 
         $new_money = $user->money - $toTop->price * $days;
-        DB::table('users')->where('id', $user->id)->update(['money' => $new_money]);
+        DB::table('users')->where('id', $user->id)
+            ->update(['money' => $new_money]);
 
         return response('top');
     }
@@ -221,7 +233,8 @@ class MoneyController extends Controller
         ])->where('user_id', $user->id)->first();
 
         $money = $user->money;
-        $toTop = collect(DB::select('select price from prices where price_name = :price_name',
+        $toTop
+            = collect(DB::select('select price from prices where price_name = :price_name',
             ['price_name' => 'seach']))->first();
 
         $days = $request->days;
@@ -236,8 +249,9 @@ class MoneyController extends Controller
         $days = floor($days); //кругляем полученнаы дни
         //
 
-        if ($end_vip == null or $end_vip < $current_date) {  //есть ли сейчас vip статусэ
-            echo "endvip";
+        if ($end_vip == null or $end_vip
+            < $current_date
+        ) {  //есть ли сейчас vip статусэ
             $end_vip = $current_date;
             $begin_vip = $current_date;
             $end_vip = $this->addDayswithdate($end_vip, $days);
@@ -250,13 +264,12 @@ class MoneyController extends Controller
         $girl->end_search = $end_vip;
         $girl->begin_search = $begin_vip;
         $girl->save();
-
         $new_money = $user->money - $toTop->price * $days;
-        DB::table('users')->where('id', $user->id)->update(['money' => $new_money]);
+        DB::table('users')->where('id', $user->id)
+            ->update(['money' => $new_money]);
 
         return response('seach');
     }
-
 
 
 }
